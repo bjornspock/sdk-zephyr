@@ -542,6 +542,7 @@ if BT_CTLR_GPIO_PA
 config BT_CTLR_GPIO_PA_PIN
 	int "Power Amplifier GPIO pin number"
 	range 0 47 if SOC_NRF52840
+	range 0 47 if SOC_NRF5340_CPUNET
 	range 0 31
 	help
 	  GPIO Pin number connected to a Power Amplifier.
@@ -554,7 +555,7 @@ config BT_CTLR_GPIO_PA_POL_INV
 config BT_CTLR_GPIO_PA_OFFSET
 	int "Time from PA ON to Tx ready"
 	default 5
-	range 0 10
+	range 0 38
 	help
 	  Time before Tx ready to turn on PA.
 
@@ -573,6 +574,7 @@ if BT_CTLR_GPIO_LNA
 config BT_CTLR_GPIO_LNA_PIN
 	int "Low Noise Amplifier GPIO pin number"
 	range 0 47 if SOC_NRF52840
+	range 0 47 if SOC_NRF5340_CPUNET
 	range 0 31
 	help
 	  GPIO Pin number connected to a Low Noise Amplifier.
@@ -585,7 +587,7 @@ config BT_CTLR_GPIO_LNA_POL_INV
 config BT_CTLR_GPIO_LNA_OFFSET
 	int "Time from LNA ON to Rx ready"
 	default 5
-	range 0 10
+	range 0 38
 	help
 	  Time before Rx ready to turn on LNA.
 
