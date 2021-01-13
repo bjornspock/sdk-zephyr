@@ -264,12 +264,8 @@ static inline void hal_trigger_rateoverride_ppi_config(void)
 /******************************************************************************/
 #if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 
-<<<<<<< HEAD
-#define HAL_ENABLE_PALNA_PPI 14
-=======
 #define HAL_ENABLE_PALNA_PPI  15
 #define HAL_DISABLE_PALNA_PPI 16
->>>>>>> 2a99857cad (Bluetooth: controller: Refactor PA/LNA PPI configuration)
 
 static inline void hal_palna_ppi_setup(void)
 {
@@ -279,15 +275,6 @@ static inline void hal_palna_ppi_setup(void)
 		(uint32_t)&(EVENT_TIMER->EVENTS_COMPARE[2]),
 		(uint32_t)&(NRF_GPIOTE->TASKS_OUT[
 				CONFIG_BT_CTLR_PA_LNA_GPIOTE_CHAN]));
-<<<<<<< HEAD
-}
-
-#define HAL_DISABLE_PALNA_PPI 15
-
-static inline void hal_disable_palna_ppi_config(void)
-{
-=======
->>>>>>> 2a99857cad (Bluetooth: controller: Refactor PA/LNA PPI configuration)
 	nrf_ppi_channel_endpoint_setup(
 		NRF_PPI,
 		HAL_DISABLE_PALNA_PPI,
@@ -813,6 +800,30 @@ static inline void hal_palna_ppi_setup(void)
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
 
 /******************************************************************************/
+#if defined(CONFIG_BT_CTLR_GPIO_PDN_PIN) || defined(CONFIG_BT_CTLR_GPIO_CSN_PIN)
+
+#define HAL_ENABLE_FEM_PPI 3
+#define HAL_DISABLE_FEM_PPI HAL_ENABLE_FEM_PPI
+
+static inline void hal_fem_ppi_setup(void)
+{
+	nrf_gpiote_task_t task;
+
+	nrf_timer_publish_set(EVENT_TIMER, NRF_TIMER_EVENT_COMPARE3,
+			      HAL_ENABLE_FEM_PPI);
+	nrf_radio_publish_set(NRF_RADIO, NRF_RADIO_EVENT_DISABLED,
+			      HAL_DISABLE_FEM_PPI);
+
+	task = nrf_gpiote_out_task_get(CONFIG_BT_CTLR_PDN_GPIOTE_CHAN);
+	nrf_gpiote_subscribe_set(NRF_GPIOTE, task, HAL_DISABLE_FEM_PPI);
+	task = nrf_gpiote_out_task_get(CONFIG_BT_CTLR_CSN_GPIOTE_CHAN);
+	nrf_gpiote_subscribe_set(NRF_GPIOTE, task, HAL_DISABLE_FEM_PPI);
+}
+
+#endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
+
+/******************************************************************************/
+
 #if !defined(CONFIG_BT_CTLR_TIFS_HW)
 /* DPPI setup used for SW-based auto-switching during TIFS. */
 

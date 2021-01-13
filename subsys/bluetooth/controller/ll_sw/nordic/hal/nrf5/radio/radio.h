@@ -92,6 +92,9 @@ void radio_gpio_lna_on(void);
 void radio_gpio_lna_off(void);
 void radio_gpio_pa_lna_enable(uint32_t trx_us);
 void radio_gpio_pa_lna_disable(void);
+void radio_gpio_pdn_setup(void);
+void radio_gpio_csn_setup(void);
+
 
 void *radio_ccm_rx_pkt_set(struct ccm *ccm, uint8_t phy, void *pkt);
 void *radio_ccm_tx_pkt_set(struct ccm *ccm, void *pkt);

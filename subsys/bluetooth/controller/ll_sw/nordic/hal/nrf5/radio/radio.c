@@ -123,6 +123,11 @@ void radio_reset(void)
 #if defined(CONFIG_BT_CTLR_GPIO_PA_PIN) || defined(CONFIG_BT_CTLR_GPIO_LNA_PIN)
 	hal_palna_ppi_setup();
 #endif
+#if defined(CONFIG_BT_CTLR_GPIO_PDN_PIN) || defined(CONFIG_BT_CTLR_GPIO_CSN_PIN)
+	hal_fem_ppi_setup();
+	radio_gpio_pdn_setup();
+	radio_gpio_csn_setup();
+#endif
 }
 
 void radio_phy_set(uint8_t phy, uint8_t flags)
@@ -1006,6 +1011,54 @@ void radio_gpio_lna_setup(void)
 #endif
 }
 
+#if defined(CONFIG_BT_CTLR_GPIO_PDN_PIN)
+void radio_gpio_pdn_setup(void)
+{
+	/* NOTE: With GPIO Pins above 31, left shift of
+	 *       CONFIG_BT_CTLR_GPIO_PA_PIN by GPIOTE_CONFIG_PSEL_Pos will
+	 *       set the NRF_GPIOTE->CONFIG[n].PORT to 1 (P1 port).
+	 */
+	NRF_GPIOTE->CONFIG[CONFIG_BT_CTLR_PDN_GPIOTE_CHAN] =
+		(GPIOTE_CONFIG_MODE_Task <<
+		 GPIOTE_CONFIG_MODE_Pos) |
+		(CONFIG_BT_CTLR_GPIO_PDN_PIN <<
+		 GPIOTE_CONFIG_PSEL_Pos) |
+		(GPIOTE_CONFIG_POLARITY_Toggle <<
+		 GPIOTE_CONFIG_POLARITY_Pos) |
+#if defined(CONFIG_BT_CTLR_GPIO_PDN_POL_INV)
+		(GPIOTE_CONFIG_OUTINIT_High <<
+		 GPIOTE_CONFIG_OUTINIT_Pos);
+#else
+		(GPIOTE_CONFIG_OUTINIT_Low <<
+		 GPIOTE_CONFIG_OUTINIT_Pos);
+#endif
+}
+#endif /* CONFIG_BT_CTLR_GPIO_PDN_PIN */
+
+#if defined(CONFIG_BT_CTLR_GPIO_CSN_PIN)
+void radio_gpio_csn_setup(void)
+{
+	/* NOTE: With GPIO Pins above 31, left shift of
+	 *       CONFIG_BT_CTLR_GPIO_PA_PIN by GPIOTE_CONFIG_PSEL_Pos will
+	 *       set the NRF_GPIOTE->CONFIG[n].PORT to 1 (P1 port).
+	 */
+	NRF_GPIOTE->CONFIG[CONFIG_BT_CTLR_CSN_GPIOTE_CHAN] =
+		(GPIOTE_CONFIG_MODE_Task <<
+		 GPIOTE_CONFIG_MODE_Pos) |
+		(CONFIG_BT_CTLR_GPIO_CSN_PIN <<
+		 GPIOTE_CONFIG_PSEL_Pos) |
+		(GPIOTE_CONFIG_POLARITY_Toggle <<
+		 GPIOTE_CONFIG_POLARITY_Pos) |
+#if defined(CONFIG_BT_CTLR_GPIO_CSN_POL_INV)
+		(GPIOTE_CONFIG_OUTINIT_High <<
+		 GPIOTE_CONFIG_OUTINIT_Pos);
+#else
+		(GPIOTE_CONFIG_OUTINIT_Low <<
+		 GPIOTE_CONFIG_OUTINIT_Pos);
+#endif
+}
+#endif /* CONFIG_BT_CTLR_GPIO_CSN_PIN */
+
 void radio_gpio_lna_on(void)
 {
 #if defined(CONFIG_BT_CTLR_GPIO_LNA_POL_INV)
@@ -1028,14 +1081,15 @@ void radio_gpio_lna_off(void)
 void radio_gpio_pa_lna_enable(uint32_t trx_us)
 {
 	nrf_timer_cc_set(EVENT_TIMER, 2, trx_us);
+	nrf_timer_cc_set(EVENT_TIMER, 3, trx_us - CONFIG_BT_CTLR_GPIO_PDN_OFFSET );
 	hal_radio_nrf_ppi_channels_enable(BIT(HAL_ENABLE_PALNA_PPI) |
-				BIT(HAL_DISABLE_PALNA_PPI));
+				BIT(HAL_DISABLE_PALNA_PPI) | BIT(HAL_ENABLE_FEM_PPI));
 }
 
 void radio_gpio_pa_lna_disable(void)
 {
 	hal_radio_nrf_ppi_channels_disable(BIT(HAL_ENABLE_PALNA_PPI) |
-				 BIT(HAL_DISABLE_PALNA_PPI));
+				 BIT(HAL_DISABLE_PALNA_PPI) | BIT(HAL_DISABLE_FEM_PPI));
 	NRF_GPIOTE->CONFIG[CONFIG_BT_CTLR_PA_LNA_GPIOTE_CHAN] = 0;
 }
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */

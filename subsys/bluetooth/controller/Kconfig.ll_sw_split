@@ -611,6 +611,11 @@ config BT_CTLR_GPIO_PDN_PIN
 	help
 	  GPIO Pin number connected to the PDN pin of the nRF21540 FEM.
 
+config BT_CTLR_GPIO_PDN_POL_INV
+	bool "Inverted polarity for the PA pin"
+	help
+	  Enable inverted polarity (active low) for the PA pin.
+
 config BT_CTLR_GPIO_PDN_OFFSET
 	int "Time from PDN high to TRx ready"
 	default 28
@@ -626,6 +631,11 @@ config BT_CTLR_GPIO_CSN_PIN
 	help
 	  GPIO Pin number connected to the CSN pin of the nRF21540 FEM.
 
+config BT_CTLR_GPIO_CSN_POL_INV
+	bool "Inverted polarity for the PA pin"
+	help
+	  Enable inverted polarity (active low) for the PA pin.
+
 config BT_CTLR_GPIO_CSN_OFFSET
 	int "Time from CSN low to Rx ready"
 	default 28
@@ -634,6 +644,24 @@ config BT_CTLR_GPIO_CSN_OFFSET
 	  Time before TRX ready to pull CSN line low.
 
 endif # BT_CTLR_FEM_NRF21540
+
+config BT_CTLR_PDN_GPIOTE_CHAN
+	# Hidden "nRF5 GPIO FEM PDN GPIOTE Channel"
+	int
+	depends on SOC_FAMILY_NRF && (BT_CTLR_FEM_NRF21540)
+	default 4 if PWM_NRF5_SW
+	default 4
+	help
+	  Select the nRF5 GPIOTE channel to use for PA/LNA GPIO feature.
+
+config BT_CTLR_CSN_GPIOTE_CHAN
+	# Hidden "nRF5 GPIO FEM CSN GPIOTE Channel"
+	int
+	depends on SOC_FAMILY_NRF && (BT_CTLR_FEM_NRF21540)
+	default 5 if PWM_NRF5_SW
+	default 5
+	help
+	  Select the nRF5 GPIOTE channel to use for PA/LNA GPIO feature.	  
 
 config BT_CTLR_PA_LNA_GPIOTE_CHAN
 	# Hidden "nRF5 GPIO PA/LNA GPIOTE Channel"
