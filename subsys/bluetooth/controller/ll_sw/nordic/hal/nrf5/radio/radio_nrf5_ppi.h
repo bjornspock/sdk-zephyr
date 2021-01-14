@@ -286,6 +286,34 @@ static inline void hal_palna_ppi_setup(void)
 #endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
 
 /******************************************************************************/
+#if defined(CONFIG_BT_CTLR_GPIO_PDN_PIN) || defined(CONFIG_BT_CTLR_GPIO_CSN_PIN)
+
+#define HAL_ENABLE_FEM_PPI  17
+#define HAL_DISABLE_FEM_PPI 19
+
+static inline void hal_fem_ppi_setup(void)
+{
+	nrf_ppi_channel_and_fork_endpoint_setup(
+		NRF_PPI,
+		HAL_ENABLE_FEM_PPI,
+		(uint32_t)&(EVENT_TIMER->EVENTS_COMPARE[3]),
+		(uint32_t)&(NRF_GPIOTE->TASKS_OUT[
+				CONFIG_BT_CTLR_PDN_GPIOTE_CHAN]),
+		(uint32_t)&(NRF_GPIOTE->TASKS_OUT[
+				CONFIG_BT_CTLR_CSN_GPIOTE_CHAN]));
+	nrf_ppi_channel_and_fork_endpoint_setup(
+		NRF_PPI,
+		HAL_DISABLE_FEM_PPI,
+		(uint32_t)&(NRF_RADIO->EVENTS_DISABLED),
+		(uint32_t)&(NRF_GPIOTE->TASKS_OUT[
+				CONFIG_BT_CTLR_PDN_GPIOTE_CHAN]),
+		(uint32_t)&(NRF_GPIOTE->TASKS_OUT[
+				CONFIG_BT_CTLR_CSN_GPIOTE_CHAN]));
+}
+
+#endif /* CONFIG_BT_CTLR_GPIO_PA_PIN || CONFIG_BT_CTLR_GPIO_LNA_PIN */
+
+/******************************************************************************/
 #if !defined(CONFIG_BT_CTLR_TIFS_HW)
 /* PPI setup used for SW-based auto-switching during TIFS. */
 
